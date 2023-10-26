@@ -1,14 +1,14 @@
 <?xml version="1.0" ?>
 <robot name="turtlebot3_waffle_pi_for_open_manipulator" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:include filename="$(find tidybot)/urdf/common_properties.xacro"/>
-  <!-- <xacro:include filename="$(find tidybot)/urdf/turtlebot3_waffle_pi_for_open_manipulator.gazebo.xacro"/> -->
+  <!-- <xacro:include filename="$(find tidybot)/urdf/robot_description.gazebo.xacro"/> -->
 
   <!-- Uncomment to disable the physics engine! -->
   <gazebo>
     <static>true</static>
   </gazebo>
 
-
+    <!-- ##################### BASE ################# -->
   <link name="base_footprint"/>
 
   <joint name="base_joint" type="fixed">
@@ -44,6 +44,8 @@
                izz="1.4612727e-02" />                -->
     </inertial>
   </link>
+
+    <!-- ##################### WHEELS ################# -->
 
   <joint name="wheel_left_joint" type="continuous">
     <parent link="base_link"/>
@@ -109,6 +111,7 @@
       </inertial>
   </link>
 
+    <!-- ##################### CASTERS ################# -->
   <joint name="caster_back_right_joint" type="fixed">
     <parent link="base_link"/>
     <child link="caster_back_right_link"/>
@@ -155,6 +158,7 @@
     </inertial>
   </link>
 
+    <!-- ##################### SENSORS ################# -->
   <joint name="imu_joint" type="fixed">
     <parent link="base_link"/>
     <child link="imu_link"/>
