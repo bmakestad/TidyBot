@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <robot name="turtlebot3_waffle_pi_for_open_manipulator" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="$(find urdf)/common_properties.xacro"/>
-  <xacro:include filename="$(find urdf)/turtlebot3_waffle_pi_for_open_manipulator.gazebo.xacro"/>
+  <xacro:include filename="$(find tidybot)/urdf/common_properties.xacro"/>
+  <xacro:include filename="$(find tidybot)/urdf/turtlebot3_waffle_pi_for_open_manipulator.gazebo.xacro"/>
 
   <link name="base_footprint"/>
 
