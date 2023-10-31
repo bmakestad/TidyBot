@@ -111,6 +111,46 @@
       </inertial>
   </link>
 
+
+
+
+  <!-- ##################### ARM BASE ################# -->
+
+  <joint name="arm_base_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="arm_base_link"/>
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+    <axis xyz="0 0 0"/>
+  </joint>
+
+  <link name="arm_base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="$(find tidybot)/meshes/arm_base.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.0465 0.0285 0.036"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0" />
+      <inertia ixx="0" ixy="0" ixz="0"
+               iyy="0" iyz="0"
+               izz="0" />
+      </inertial>
+  </link>
+
+
+
+
     <!-- ##################### CASTERS ################# -->
   <joint name="caster_back_right_joint" type="fixed">
     <parent link="base_link"/>
