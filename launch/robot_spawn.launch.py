@@ -5,6 +5,7 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+from launch.actions import ExecuteProcess
 
 from launch_ros.actions import Node
 import xacro
@@ -57,8 +58,23 @@ def generate_launch_description():
         output='screen'
     )
 
+
+    # load_joint_trajectory= ExecuteProcess(
+    # cmd=['ros2', 'control', 'load_controller', '--set-state', 'start','joint_trajectory'],
+    # output='screen'
+    # )
+
+    # load_gripper_control = ExecuteProcess(
+    # cmd=['ros2', 'control', 'load_controller', '--set-state', 'start','gripper_control'],
+    # output='screen'
+    # )   
+
+
+
     return LaunchDescription([
         sim_time_arg,
         node_robot_state_publisher,
         spawn_entity
+        # load_gripper_control,
+        # load_joint_trajectory
     ])
