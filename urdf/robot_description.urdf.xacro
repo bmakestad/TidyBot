@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<robot name="turtlebot3_waffle_pi_for_open_manipulator" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="tidybot" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:include filename="$(find tidybot)/urdf/common_properties.xacro"/>
   <!-- <xacro:include filename="$(find tidybot)/urdf/robot_control.gazebo.xacro"/> -->
   <!-- <xacro:include filename="$(find tidybot)/urdf/robot_description.gazebo.xacro"/> -->
@@ -41,6 +41,18 @@
   <xacro:property name="third_link_width" value="0.024"/>
   <xacro:property name="third_link_height" value="0.120"/>
     
+  <xacro:property name="gripper_base_length" value="0.070"/>
+  <xacro:property name="gripper_base_width" value="0.104"/>
+  <xacro:property name="gripper_base_height" value="0.05825"/>
+
+  <xacro:property name="finger_length" value="0.072"/>
+  <xacro:property name="finger_width" value="0.016"/>
+  <xacro:property name="finger_height" value="0.0536"/>
+  <xacro:property name="finger_length_to_center" value="0.0395"/>
+  
+  <xacro:property name="finger_origin_offset" value="0.012"/>
+  <xacro:property name="finger_offset_gripper_open" value="0.036"/>
+  
 
 
   <!-- ####################### -->
@@ -84,7 +96,6 @@
   </link>
 
     <!-- ##################### WHEELS ################# -->
-
   <joint name="wheel_left_joint" type="continuous">
     <parent link="base_link"/>
     <child link="wheel_left_link"/>
@@ -226,7 +237,7 @@
     <parent link="first_link"/>
     <child link="second_link"/>
     <origin xyz="0 0 ${first_link_height}" rpy="0 0 0"/>
-    <axis xyz="0 0 1"/>
+    <axis xyz="0 1 0"/>
     <limit effort="100" velocity="100" lower="-${pi/2}" upper="${pi/2}"/>
     <dynamics damping="0.7" friction="1.0"/>
 
@@ -266,16 +277,16 @@
   <joint name="third_link_joint" type="revolute">
     <parent link="second_link"/>
     <child link="third_link"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-    <axis xyz="0 0 1"/>
+    <origin xyz="${link_offset_x} 0 ${second_link_height}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
     <limit effort="100" velocity="100" lower="-${pi/2}" upper="${pi/2}"/>
     <dynamics damping="0.7" friction="1.0"/>
 
   </joint>
-  <!-- OBS OBS OBS OBS, SJEKK RPY -->
+  
   <link name="third_link">
     <visual>    
-      <origin xyz="${link_offset_x} 0 ${second_link_height}" rpy="${pi} 0 ${pi/2}"/>
+      <origin xyz="${third_link_height} 0 0" rpy="0 0 ${pi/2}"/>
       <geometry>
         <mesh filename="$(find tidybot)/meshes/link_120.stl" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -285,7 +296,79 @@
     <collision>
       <origin xyz="0 0 ${-(second_link_height)/2 - 0.0195}" rpy="0 0 0"/>
       <geometry>
-        <box size="${third_link_length} ${third_link_width} 110"/>
+        <box size="${third_link_length} ${third_link_width} 0.110"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.001" />
+      <inertia ixx="0.001" ixy="0.001" ixz="0.001"
+               iyy="0.001" iyz="0.001"
+               izz="0.001" />
+      </inertial>
+  </link>
+
+  <!-- ################## GRIPPER BASE ################### -->
+  <joint name="gripper_base_joint" type="revolute">
+    <parent link="third_link"/>
+    <child link="gripper_base"/>
+    <origin xyz="${third_link_height} 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="100" velocity="100" lower="-${pi/2}" upper="${pi/2}"/>
+    <dynamics damping="0.7" friction="1.0"/>
+
+  </joint>
+  
+  <link name="gripper_base">
+    <visual>    
+      <origin xyz="0 0 0" rpy="0 0 ${-pi/2}"/>
+      <geometry>
+        <mesh filename="$(find tidybot)/meshes/gripper_base.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0 0 0"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.001" />
+      <inertia ixx="0.001" ixy="0.001" ixz="0.001"
+               iyy="0.001" iyz="0.001"
+               izz="0.001" />
+      </inertial>
+  </link>
+
+  <!-- ################# LEFT FINGER ################# -->
+  <joint name="left_finger_joint" type="prismatic">
+    <parent link="gripper_base"/>
+    <child link="left_finger"/>
+    <origin xyz="${gripper_base_length} ${finger_origin_offset + finger_offset_gripper_open} 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="100" velocity="100" lower="0" upper="${finger_origin_offset + finger_offset_gripper_open}"/>
+    <dynamics damping="0.7" friction="1.0"/>
+
+  </joint>
+  
+  <link name="left_finger">
+    <visual>    
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="$(find tidybot)/meshes/gripper_finger.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0 0 0"/>
       </geometry>
     </collision>
 
@@ -299,8 +382,41 @@
   </link>
 
 
+  <!-- ################# RIGHT FINGER ################# -->
+  <joint name="right_finger_joint" type="prismatic">
+    <parent link="gripper_base"/>
+    <child link="right_finger"/>
+    <origin xyz="${gripper_base_length} ${-(finger_origin_offset + finger_offset_gripper_open)} 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="100" velocity="100" lower="${-(finger_origin_offset + finger_offset_gripper_open)}" upper="0"/>
+    <dynamics damping="0.7" friction="1.0"/>
 
+  </joint>
+  
+  <link name="right_finger">
+    <visual>    
+      <origin xyz="0 0 0" rpy="${pi} 0 0"/>
+      <geometry>
+        <mesh filename="$(find tidybot)/meshes/gripper_finger.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="dark"/>
+    </visual>
 
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0 0 0"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.001" />
+      <inertia ixx="0.001" ixy="0.001" ixz="0.001"
+               iyy="0.001" iyz="0.001"
+               izz="0.001" />
+      </inertial>
+  </link>
 
 
 
@@ -369,7 +485,7 @@
 
   <link name="base_scan">
     <visual>
-      <origin xyz="0 0 0.0" rpy="0 0 0"/>
+      <origin xyz="0.02 0 0" rpy="0 0 0"/>
       <geometry>
         <mesh filename="$(find tidybot)/meshes/lds.stl" scale="0.001 0.001 0.001"/>
       </geometry>
