@@ -2,9 +2,10 @@
 <robot name="tidybot" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:include filename="$(find tidybot)/urdf/common_properties.xacro"/>
   <!-- <xacro:include filename="$(find tidybot)/urdf/robot_control.gazebo.xacro"/> -->
-  <!-- <xacro:include filename="$(find tidybot)/urdf/robot_description.gazebo.xacro"/> -->
+  <!-- <xacro:include filename="$(find tidybot)/urdf/robot_description_original.gazebo.xacro"/> -->
 
   <!-- Uncomment to disable the physics engine! -->
+
   <gazebo>
     <static>true</static>
   </gazebo>
@@ -34,8 +35,8 @@
   <xacro:property name="first_link_height" value="0.0405"/>
 
   <xacro:property name="second_link_length" value="0.024"/>
-  <xacro:property name="second_link_width" value="0.024"/>
-  <xacro:property name="second_link_height" value="0.150"/>
+  <xacro:property name="second_link_width" value="0.170"/>
+  <xacro:property name="second_link_height" value="0.024"/>
 
   <xacro:property name="third_link_length" value="0.024"/>
   <xacro:property name="third_link_width" value="0.024"/>
@@ -52,6 +53,8 @@
   
   <xacro:property name="finger_origin_offset" value="0.012"/>
   <xacro:property name="finger_offset_gripper_open" value="0.036"/>
+
+  <xacro:property name="collision_box_reduction" value="0.02"/>
   
 
 
@@ -64,7 +67,7 @@
   <joint name="base_joint" type="fixed">
     <parent link="base_footprint"/>
     <child link="base_link" />
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="0 0 0.03" rpy="0 0 0"/>
   </joint>
 
   <link name="base_link">
@@ -77,21 +80,18 @@
     </visual>
 
     <collision>
-      <origin xyz="-0.064 0 0.047" rpy="0 0 0"/>
+      <origin xyz="-0.064 0 0.04575" rpy="0 0 0"/>
       <geometry>
-        <box size="0.266 0.266 0.094"/>
+        <box size="0.266 0.266 0.0915"/>
       </geometry>
     </collision>
 
     <inertial>
       <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
       <mass value="1.6329594e+00"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-               iyy="1.0" iyz="0.0"
-               izz="1.0" />
-      <!-- <inertia ixx="8.7002718e-03" ixy="-4.7576583e-05" ixz="1.1160499e-04"
+      <inertia ixx="8.7002718e-03" ixy="-4.7576583e-05" ixz="1.1160499e-04"
                iyy="8.6195418e-03" iyz="-3.5422299e-06"
-               izz="1.4612727e-02" />                -->
+               izz="1.4612727e-02" />                
     </inertial>
   </link>
 
@@ -101,6 +101,8 @@
     <child link="wheel_left_link"/>
     <origin xyz="0.0 0.144 0.023" rpy="-1.57 0 0"/>
     <axis xyz="0 0 1"/>
+    <limit effort="100" velocity="100"/>
+    <dynamics damping="0.7" friction="0.01"/>
   </joint>
 
   <link name="wheel_left_link">
@@ -133,6 +135,8 @@
     <child link="wheel_right_link"/>
     <origin xyz="0.0 -0.144 0.023" rpy="-1.57 0 0"/>
     <axis xyz="0 0 1"/>
+    <limit effort="100" velocity="100"/>
+    <dynamics damping="0.7" friction="0.1"/>
   </joint>
 
   <link name="wheel_right_link">
@@ -182,7 +186,7 @@
     </visual>
 
     <collision>
-      <origin xyz="${base_offset_x} 0 ${base_height + (arm_base_height)/2}" rpy="0 0 0"/>
+      <origin xyz="-0.0120 0 ${arm_base_height / 2}" rpy="0 0 0"/>
       <geometry>
         <box size="${arm_base_length} ${arm_base_width} ${arm_base_height}"/>
       </geometry>
@@ -190,10 +194,10 @@
 
     <inertial>
       <origin xyz="0 0 0" />
-      <mass value="0.001" />
-      <inertia ixx="0.001" ixy="0.001" ixz="0.001"
-               iyy="0.001" iyz="0.001"
-               izz="0.001" />
+      <mass value="0.045438" />
+      <inertia ixx="7196.83" ixy="2.068e-09" ixz="-129.011"
+               iyy="12433.762" iyz="-2.775e-10"
+               izz="11004.658" />
       </inertial>
   </link>
 
@@ -216,18 +220,18 @@
     </visual>
 
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 ${first_link_height / 2}" rpy="0 0 0"/>
       <geometry>
-        <box size="${first_link_length} ${first_link_width} ${first_link_height}"/>
+        <box size="${first_link_length - 0.001} ${first_link_width - 0.001} ${first_link_height / 2}"/>
       </geometry>
     </collision>
 
     <inertial>
       <origin xyz="0 0 0" />
-      <mass value="0.001" />
-      <inertia ixx="0.001" ixy="0.001" ixz="0.001"
-               iyy="0.001" iyz="0.001"
-               izz="0.001" />
+      <mass value="0.060172" />
+      <inertia ixx="21477.332" ixy="13.541" ixz="-430.792"
+               iyy="21301.068" iyz="-111.614"
+               izz="12348.458" />
       </inertial>
   </link>
 
@@ -236,35 +240,35 @@
   <joint name="second_link_joint" type="revolute">
     <parent link="first_link"/>
     <child link="second_link"/>
-    <origin xyz="0 0 ${first_link_height}" rpy="0 0 0"/>
+    <origin xyz="0 0 ${arm_base_height}" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit effort="100" velocity="100" lower="-${pi/2}" upper="${pi/2}"/>
-    <dynamics damping="0.7" friction="1.0"/>
+    <limit effort="100" velocity="100" lower="${-(pi)}" upper="${pi}"/>
+    <dynamics damping="0.7" friction="0.01"/>
 
   </joint>
 
   <link name="second_link">
     <visual>
-      <origin xyz="${link_offset_x} 0 ${second_link_height}" rpy="0 0 ${-pi/2}"/>
+      <origin xyz="0 0 ${second_link_width}" rpy="${-(pi/2)} 0 ${pi/2}"/>
       <geometry>
-        <mesh filename="$(find tidybot)/meshes/bent_link_150.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="$(find tidybot)/meshes/link_170.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="dark"/>
     </visual>
 
     <collision>
-      <origin xyz="0 0 ${-(second_link_height)/2 - 0.0195}" rpy="0 0 0"/>
+      <origin xyz="0 0 ${second_link_width / 2}" rpy="${pi/2} 0 0"/>
       <geometry>
-        <box size="${second_link_length} ${second_link_width} 110"/>
+        <box size="${second_link_length} ${second_link_width - 0.04} ${second_link_height}"/>
       </geometry>
     </collision>
 
     <inertial>
       <origin xyz="0 0 0" />
-      <mass value="0.001" />
-      <inertia ixx="0.001" ixy="0.001" ixz="0.001"
-               iyy="0.001" iyz="0.001"
-               izz="0.001" />
+      <mass value="0.112589" />
+      <inertia ixx="3.509e+05" ixy="-61.351" ixz="-1202.759"
+               iyy="3.432e+05" iyz="-36743.271"
+               izz="38079.446" />
       </inertial>
   </link>
 
@@ -277,10 +281,10 @@
   <joint name="third_link_joint" type="revolute">
     <parent link="second_link"/>
     <child link="third_link"/>
-    <origin xyz="${link_offset_x} 0 ${second_link_height}" rpy="0 0 0"/>
+    <origin xyz="0 0 ${second_link_width}" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit effort="100" velocity="100" lower="-${pi/2}" upper="${pi/2}"/>
-    <dynamics damping="0.7" friction="1.0"/>
+    <limit effort="100" velocity="100" lower="${-(2*pi/3)}" upper="${2*pi/3}"/>
+    <dynamics damping="0.7" friction="0.01"/>
 
   </joint>
   
@@ -294,18 +298,18 @@
     </visual>
 
     <collision>
-      <origin xyz="0 0 ${-(second_link_height)/2 - 0.0195}" rpy="0 0 0"/>
+      <origin xyz="${third_link_height / 2} 0 0" rpy="0 ${pi/2} 0"/>
       <geometry>
-        <box size="${third_link_length} ${third_link_width} 0.110"/>
+        <box size="${third_link_length} ${third_link_width} ${third_link_height - collision_box_reduction}"/>
       </geometry>
     </collision>
 
     <inertial>
       <origin xyz="0 0 0" />
-      <mass value="0.001" />
-      <inertia ixx="0.001" ixy="0.001" ixz="0.001"
-               iyy="0.001" iyz="0.001"
-               izz="0.001" />
+      <mass value="0.094954" />
+      <inertia ixx="1.744e+05" ixy="647.52" ixz="-7.071"
+               iyy="22596.123" iyz="-389.804"
+               izz="1.803e+05" />
       </inertial>
   </link>
 
@@ -316,7 +320,7 @@
     <origin xyz="${third_link_height} 0 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
     <limit effort="100" velocity="100" lower="-${pi/2}" upper="${pi/2}"/>
-    <dynamics damping="0.7" friction="1.0"/>
+    <dynamics damping="0.7" friction="0.01"/>
 
   </joint>
   
@@ -330,18 +334,18 @@
     </visual>
 
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="${gripper_base_length / 2} 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0 0 0"/>
+        <box size="${gripper_base_length} ${gripper_base_width} ${gripper_base_height}"/>
       </geometry>
     </collision>
 
     <inertial>
       <origin xyz="0 0 0" />
-      <mass value="0.001" />
-      <inertia ixx="0.001" ixy="0.001" ixz="0.001"
-               iyy="0.001" iyz="0.001"
-               izz="0.001" />
+      <mass value="0.102503" />
+      <inertia ixx="42037.078" ixy="0.002" ixz="-0.051"
+               iyy="74712.63" iyz="1902.432"
+               izz="61851.428" />
       </inertial>
   </link>
 
@@ -366,18 +370,18 @@
     </visual>
 
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="${finger_length / 2} ${-((finger_origin_offset / 2) - 0.002)} 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0 0 0"/>
+        <box size="${finger_length} ${finger_width} ${finger_height}"/>
       </geometry>
     </collision>
 
     <inertial>
       <origin xyz="0 0 0" />
-      <mass value="0.001" />
-      <inertia ixx="0.001" ixy="0.001" ixz="0.001"
-               iyy="0.001" iyz="0.001"
-               izz="0.001" />
+      <mass value="0.02010" />
+      <inertia ixx="4734.61" ixy="700.053" ixz="22.926"
+               iyy="12948.951" iyz="6.405"
+               izz="8977.298" />
       </inertial>
   </link>
 
@@ -403,18 +407,18 @@
     </visual>
 
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="${finger_length / 2} ${(finger_origin_offset / 2) - 0.002} 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0 0 0"/>
+        <box size="${finger_length} ${finger_width} ${finger_height}"/>
       </geometry>
     </collision>
 
     <inertial>
       <origin xyz="0 0 0" />
-      <mass value="0.001" />
-      <inertia ixx="0.001" ixy="0.001" ixz="0.001"
-               iyy="0.001" iyz="0.001"
-               izz="0.001" />
+      <mass value="0.02010" />
+      <inertia ixx="4734.61" ixy="700.053" ixz="22.926"
+               iyy="12948.951" iyz="6.405"
+               izz="8977.298" />
       </inertial>
   </link>
 
@@ -485,7 +489,7 @@
 
   <link name="base_scan">
     <visual>
-      <origin xyz="0.02 0 0" rpy="0 0 0"/>
+      <origin xyz="0.02 0 -0.01" rpy="0 0 0"/>
       <geometry>
         <mesh filename="$(find tidybot)/meshes/lds.stl" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -493,9 +497,9 @@
     </visual>
 
     <collision>
-      <origin xyz="0.015 0 -0.0065" rpy="0 0 0"/>
+      <origin xyz="0.032 0 -0.015" rpy="0 0 0"/>
       <geometry>
-        <cylinder length="0.0315" radius="0.045"/>
+        <cylinder length="0.031" radius="0.05"/>
       </geometry>
     </collision>
 

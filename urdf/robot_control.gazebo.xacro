@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot>
     
-    <gazebo reference="JOINT_NAME">
+    <gazebo reference="arm_base_joint">
         <implicitSpringDamper>true</implicitSpringDamper>
     </gazebo>
 
@@ -9,7 +9,7 @@
     <gazebo>
         <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
             <robot_sim_type>gazebo_ros2_control/GazeboSystem</robot_sim_type>
-            <parameters>$(find PACKAGE_NAME)/config/FILENAME.yaml</parameters>
+            <parameters>$(find tidybot)/config/controller_config.yaml</parameters>
         </plugin>
     </gazebo>
 
