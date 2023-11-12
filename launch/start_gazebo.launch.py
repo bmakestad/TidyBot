@@ -26,5 +26,5 @@ def generate_launch_description():
 
     return LaunchDescription([
         sim_time_arg,
-        gazebo,
+        gazebo
     ])

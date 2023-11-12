@@ -12,12 +12,13 @@ controller_manager:
       type: forward_command_controller/ForwardCommandController
 
 
-
 joint_trajectory:
   ros__parameters:
     joints:
-      - JOINT_NAME
-      - JOINT_NAME
+      - first_link_joint
+      - second_link_joint
+      - third_link_joint
+      - gripper_base_joint
       # ...
 
     command_interfaces:
@@ -28,10 +29,9 @@ joint_trajectory:
       - velocity
 
 
-
 gripper_control:
   ros__parameters:
     joints:
-      - JOINT_NAME
+      - left_finger_joint # Only need the left joint as the right joint mimics it
 
     interface_name: position
