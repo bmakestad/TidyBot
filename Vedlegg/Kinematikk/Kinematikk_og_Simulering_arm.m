@@ -1,10 +1,11 @@
-% Simulering av arm
+% Kinematikk og simulering av arm
 
 clc; clear all; close all;
 import ETS3.*
 
 syms q1 q2 q3 q4
 
+% DH - Parameter
 L1=40.5;
 L2=170;
 L3=120;
@@ -17,6 +18,7 @@ L(4) = Link('revolute', 'd', 0, 'a', L4, 'alpha', 0);
 
 arm = SerialLink(L, 'name', 'arm')
 
+% Forward kinematics
 T = arm.fkine([q1 q2 q3 q4]);
 
 T = vpa(T,3);
@@ -33,6 +35,7 @@ d = [                                                      0,                   
 
 TT = vpa([a;b;c;d],4)
 
+% Differensial kinematikk
 W0 = [0; 0; 1.962; 0; 0; 0];
 
 J0 = arm.jacob0([0 100 50 -50])
@@ -41,12 +44,13 @@ Q = J0'*W0
 
 qn = deg2rad([0 100 50 -50])
 
+% Invers kinematikk
 TA = arm.fkine(qn);
 
 invKin = arm.ikine(TA, 'mask', [1 1 1 1 0 0])
 
 
-%%
+%% Simulering av arm
 % Vektrelaterte parametere
 
 
